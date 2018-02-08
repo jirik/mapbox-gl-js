@@ -51,8 +51,8 @@ type TimePoint = number;
  *
  *  There are two main implementations of the interface -- one for properties that allow data-driven values,
  *  and one for properties that don't. There are a few "special case" implementations as well: one for properties
- *  which cross-fade between two values rather than interpolating, one for `heatmap-color`, and one for
- *  `light-position`.
+ *  which cross-fade between two values rather than interpolating, one for `heatmap-color` and `line-gradient`,
+ *  and one for `light-position`.
  *
  * @private
  */
@@ -611,25 +611,24 @@ class CrossFadedProperty<T> implements Property<T, ?CrossFaded<T>> {
 }
 
 /**
- * An implementation of `Property` for `heatmap-color` and `line-gradient`. Evaluation and interpolation are no-ops: the real
+ * An implementation of `Property` for `heatmap-color` and `line-gradient`. Interpolation is a no-op, and
+ * evaluation returns a value in order to indicate its presence, but the real
  * evaluation happens in StyleLayer classes.
  *
  * @private
  */
-class ColorRampProperty implements Property<Color, void> {
+class ColorRampProperty implements Property<Color, boolean> {
     specification: StylePropertySpecification;
 
     constructor(specification: StylePropertySpecification) {
         this.specification = specification;
     }
 
-    // possiblyEvaluate() {}
-    possiblyEvaluate(value: PropertyValue<T, T>, parameters: EvaluationParameters): T {
-        assert(!value.isDataDriven());
-        return value.expression.evaluate(parameters);
+    possiblyEvaluate(value: PropertyValue<Color, boolean>, parameters: EvaluationParameters): boolean {
+        return !!value.expression.evaluate(parameters);  // ?
     }
 
-    interpolate() {}
+    interpolate(): boolean { return false; }
 }
 
 /**

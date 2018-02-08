@@ -125,6 +125,7 @@ function drawLineTile(program, painter, tile, bucket, layer, coord, programConfi
         context.activeTexture.set(gl.TEXTURE0);
 
         let gradientTexture = layer.gradientTexture;
+        if (!layer.gradient) return;
         if (!gradientTexture) gradientTexture = layer.gradientTexture = new Texture(context, layer.gradient, gl.RGBA);
         gradientTexture.bind(gl.LINEAR, gl.CLAMP_TO_EDGE);
 

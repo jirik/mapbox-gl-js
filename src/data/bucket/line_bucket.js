@@ -158,7 +158,8 @@ class LineBucket implements Bucket {
 
     addLine(vertices: Array<Point>, feature: VectorTileFeature, join: string, cap: string, miterLimit: number, roundLimit: number, index: number) {
         let lineDistances = null;
-        if (feature.properties.$distances &&
+        if (!!feature.properties &&
+            Array.isArray(feature.properties.$distances) &&
             index < feature.properties.$distances.length &&
             feature.properties.$distances[index].length === 2) {
             const distances = feature.properties.$distances[index];
