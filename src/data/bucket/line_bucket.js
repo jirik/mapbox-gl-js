@@ -515,14 +515,7 @@ class LineBucket implements Bucket {
         const layoutVertexArray = this.layoutVertexArray;
         const indexArray = this.indexArray;
 
-        if (distancesForScaling) {
-            distance = this.scaleDistance(distance, distancesForScaling);
-            if (this.shouldClipEdges(currentVertex, distance)) {
-                round = false;
-                endLeft = 0;
-                endRight = 0;
-            }
-        }
+        if (distancesForScaling) distance = this.scaleDistance(distance, distancesForScaling);
 
         addLineVertex(layoutVertexArray, currentVertex, extrude, false, lineTurnsLeft, 0, distance);
         this.e3 = segment.vertexLength++;
