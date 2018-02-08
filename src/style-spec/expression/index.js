@@ -30,7 +30,8 @@ export type Feature = {
 
 export type GlobalProperties = {
     zoom: number,
-    heatmapDensity?: number
+    heatmapDensity?: number,
+    lineProgress?: number
 };
 
 class StyleExpression {

@@ -9,13 +9,12 @@ const {
     DataConstantProperty,
     DataDrivenProperty,
     CrossFadedProperty,
-    HeatmapColorProperty
+    ColorRampProperty
 } = require('../properties');
 
 import type Color from '../../style-spec/util/color';
 
 export type LayoutProps = {|
-    "line-gradient": DataConstantProperty<boolean>,
     "line-cap": DataConstantProperty<"butt" | "round" | "square">,
     "line-join": DataDrivenProperty<"bevel" | "round" | "miter">,
     "line-miter-limit": DataConstantProperty<number>,
@@ -23,7 +22,6 @@ export type LayoutProps = {|
 |};
 
 const layout: Properties<LayoutProps> = new Properties({
-    "line-gradient": new DataConstantProperty(styleSpec["layout_line"]["line-gradient"]),
     "line-cap": new DataConstantProperty(styleSpec["layout_line"]["line-cap"]),
     "line-join": new DataDrivenProperty(styleSpec["layout_line"]["line-join"]),
     "line-miter-limit": new DataConstantProperty(styleSpec["layout_line"]["line-miter-limit"]),
@@ -41,6 +39,7 @@ export type PaintProps = {|
     "line-blur": DataDrivenProperty<number>,
     "line-dasharray": CrossFadedProperty<Array<number>>,
     "line-pattern": CrossFadedProperty<string>,
+    "line-gradient": ColorRampProperty,
 |};
 
 const paint: Properties<PaintProps> = new Properties({
@@ -54,6 +53,7 @@ const paint: Properties<PaintProps> = new Properties({
     "line-blur": new DataDrivenProperty(styleSpec["paint_line"]["line-blur"]),
     "line-dasharray": new CrossFadedProperty(styleSpec["paint_line"]["line-dasharray"]),
     "line-pattern": new CrossFadedProperty(styleSpec["paint_line"]["line-pattern"]),
+    "line-gradient": new ColorRampProperty(styleSpec["paint_line"]["line-gradient"]),
 });
 
 module.exports = { paint, layout };

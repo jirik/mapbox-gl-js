@@ -611,19 +611,24 @@ class CrossFadedProperty<T> implements Property<T, ?CrossFaded<T>> {
 }
 
 /**
- * An implementation of `Property` for `heatmap-color`. Evaluation and interpolation are no-ops: the real
- * evaluation happens in HeatmapStyleLayer.
+ * An implementation of `Property` for `heatmap-color` and `line-gradient`. Evaluation and interpolation are no-ops: the real
+ * evaluation happens in StyleLayer classes.
  *
  * @private
  */
-class HeatmapColorProperty implements Property<Color, void> {
+class ColorRampProperty implements Property<Color, void> {
     specification: StylePropertySpecification;
 
     constructor(specification: StylePropertySpecification) {
         this.specification = specification;
     }
 
-    possiblyEvaluate() {}
+    // possiblyEvaluate() {}
+    possiblyEvaluate(value: PropertyValue<T, T>, parameters: EvaluationParameters): T {
+        assert(!value.isDataDriven());
+        return value.expression.evaluate(parameters);
+    }
+
     interpolate() {}
 }
 
@@ -669,7 +674,7 @@ class Properties<Props: Object> {
 register('DataDrivenProperty', DataDrivenProperty);
 register('DataConstantProperty', DataConstantProperty);
 register('CrossFadedProperty', CrossFadedProperty);
-register('HeatmapColorProperty', HeatmapColorProperty);
+register('ColorRampProperty', ColorRampProperty);
 
 module.exports = {
     PropertyValue,
@@ -681,6 +686,6 @@ module.exports = {
     DataConstantProperty,
     DataDrivenProperty,
     CrossFadedProperty,
-    HeatmapColorProperty,
+    ColorRampProperty,
     Properties
 };

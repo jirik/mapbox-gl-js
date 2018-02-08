@@ -9,7 +9,7 @@ const {
     DataConstantProperty,
     DataDrivenProperty,
     CrossFadedProperty,
-    HeatmapColorProperty
+    ColorRampProperty
 } = require('../properties');
 
 import type Color from '../../style-spec/util/color';

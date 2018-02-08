@@ -4,6 +4,7 @@ const Point = require('@mapbox/point-geometry');
 
 const StyleLayer = require('../style_layer');
 const LineBucket = require('../../data/bucket/line_bucket');
+const RGBAImage = require('../../util/image').RGBAImage;
 const {multiPolygonIntersectsBufferedMultiLine} = require('../../util/intersection_tests');
 const {getMaximumPaintValue, translateDistance, translate} = require('../query_utils');
 const properties = require('./line_style_layer_properties');
@@ -47,12 +48,39 @@ class LineStyleLayer extends StyleLayer {
     _unevaluatedLayout: Layout<LayoutProps>;
     layout: PossiblyEvaluated<LayoutProps>;
 
+    gradient: ?RGBAImage;
+    gradientTexture: ?Texture;
+
     _transitionablePaint: Transitionable<PaintProps>;
     _transitioningPaint: Transitioning<PaintProps>;
     paint: PossiblyEvaluated<PaintProps>;
 
     constructor(layer: LayerSpecification) {
         super(layer, properties);
+    }
+
+    setPaintProperty(name: string, value: mixed, options: {validate: boolean}) {
+        super.setPaintProperty(name, value, options);
+        if (name === 'line-gradient') {
+            this._updateGradient();
+        }
+    }
+
+    _updateGradient() {
+        const expression = this._transitionablePaint._values['line-gradient'].value.expression;
+        const gradientData = new Uint8Array(256 * 4);
+        const len = gradientData.length;
+        for (let i = 4; i < len; i += 4) {
+            const pxColor = expression.evaluate(({lineProgress: i / len}: any));
+            // the colors are being unpremultiplied because Color uses
+            // premultiplied values, and the Texture class expects unpremultiplied ones
+            gradientData[i + 0] = Math.floor(pxColor.r * 255 / pxColor.a);
+            gradientData[i + 1] = Math.floor(pxColor.g * 255 / pxColor.a);
+            gradientData[i + 2] = Math.floor(pxColor.b * 255 / pxColor.a);
+            gradientData[i + 3] = Math.floor(pxColor.a * 255);
+        }
+        this.gradient = new RGBAImage({width: 256, height: 1}, gradientData);
+        this.gradientTexture = null;
     }
 
     recalculate(parameters: EvaluationParameters) {

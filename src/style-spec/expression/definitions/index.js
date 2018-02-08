@@ -205,6 +205,11 @@ CompoundExpression.register(expressions, {
         [],
         (ctx) => ctx.globals.heatmapDensity || 0
     ],
+    'line-progress': [
+        NumberType,
+        [],
+        (ctx) => ctx.globals.lineProgress || 1
+    ],
     '+': [
         NumberType,
         varargs(NumberType),

@@ -30,7 +30,7 @@ class LineStringWorkerSource extends GeoJSONWorkerSource {
 
                     const feature = tile.features[0];
                     feature.tags = Object.assign({}, feature.tags);
-                    feature.tags.distances = [];
+                    feature.tags.$distances = [];
 
                     let distances = measure(feature.geometry);
                     distanceHash[key] = distances;
@@ -46,7 +46,7 @@ class LineStringWorkerSource extends GeoJSONWorkerSource {
                     const d = distanceOrder[i],
                         t = cover.order[i],
                         zxy = splitKey(t),
-                        distances = gj.getTile(zxy[0], zxy[1], zxy[2]).features[0].tags.distances;
+                        distances = gj.getTile(zxy[0], zxy[1], zxy[2]).features[0].tags.$distances;
 
                     distances.push([totalDistance, startDist]);
                     startDist += d;
