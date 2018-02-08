@@ -70,8 +70,8 @@ class LineStyleLayer extends StyleLayer {
         const expression = this._transitionablePaint._values['line-gradient'].value.expression;
         const gradientData = new Uint8Array(256 * 4);
         const len = gradientData.length;
-        for (let i = 4; i < len; i += 4) {
-            const pxColor = expression.evaluate(({lineProgress: i / len}: any));
+        for (let i = 0; i < len; i += 4) {
+            const pxColor = expression.evaluate(({lineProgress: (i + 4) / len}: any));
             // the colors are being unpremultiplied because Color uses
             // premultiplied values, and the Texture class expects unpremultiplied ones
             gradientData[i + 0] = Math.floor(pxColor.r * 255 / pxColor.a);
