@@ -159,15 +159,14 @@ class LineBucket implements Bucket {
     addLine(vertices: Array<Point>, feature: VectorTileFeature, join: string, cap: string, miterLimit: number, roundLimit: number, index: number) {
         let lineDistances = null;
         if (!!feature.properties &&
-            Array.isArray(feature.properties.$distances) &&
-            index < feature.properties.$distances.length &&
-            feature.properties.$distances[index].length === 2) {
-            const distances = feature.properties.$distances[index];
+            feature.properties.hasOwnProperty('$distance_total') &&
+            feature.properties.hasOwnProperty('$distance_start')) {
             lineDistances = {
-                total: distances[0],
-                start: distances[1]
+                total: feature.properties.$distance_total,
+                start: feature.properties.$distance_start
             };
         }
+
         const isPolygon = vectorTileFeatureTypes[feature.type] === 'Polygon';
 
         // If the line has duplicate vertices at the ends, adjust start/length to remove them.
@@ -456,8 +455,11 @@ class LineBucket implements Bucket {
         const indexArray = this.indexArray;
 
         if (distancesForScaling) {
+            // First scale line from tile units to [0, 2^15)
             distance = this.scaleDistance(distance, distancesForScaling);
-            if (this.shouldClipEdges(currentVertex, distance)) {
+            // Check to see if this vertex is going to be drawn across an edge,
+            // and if so, don't add square/round caps:
+            if (this.shouldClipAtEdge(currentVertex, distance)) {
                 round = false;
                 endLeft = 0;
                 endRight = 0;
@@ -536,7 +538,7 @@ class LineBucket implements Bucket {
         return (stats.start + tileDistance) * ((MAX_LINE_DISTANCE - 1) / stats.total);
     }
 
-    shouldClipEdges(vertex: Point, distance: number): boolean {
+    shouldClipAtEdge(vertex: Point, distance: number): boolean {
         // We detect non-start/end tile edge vertices for gradient lines because
         // we turn clipping off when there's no tile buffer (which we do in
         // order to calcuate line distances correctly), and turn these into butt
