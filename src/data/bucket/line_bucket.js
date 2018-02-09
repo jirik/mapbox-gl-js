@@ -150,13 +150,12 @@ class LineBucket implements Bucket {
         const miterLimit = layout.get('line-miter-limit');
         const roundLimit = layout.get('line-round-limit');
 
-        for (let i = 0; i < geometry.length; i++) {
-            const line = geometry[i];
-            this.addLine(line, feature, join, cap, miterLimit, roundLimit, i);
+        for (const line of geometry) {
+            this.addLine(line, feature, join, cap, miterLimit, roundLimit);
         }
     }
 
-    addLine(vertices: Array<Point>, feature: VectorTileFeature, join: string, cap: string, miterLimit: number, roundLimit: number, index: number) {
+    addLine(vertices: Array<Point>, feature: VectorTileFeature, join: string, cap: string, miterLimit: number, roundLimit: number) {
         let lineDistances = null;
         if (!!feature.properties &&
             feature.properties.hasOwnProperty('$distance_total') &&
