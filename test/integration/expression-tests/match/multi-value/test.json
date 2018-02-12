@@ -19,12 +19,28 @@
     [{}, {"properties": {"x": "c"}}]
   ],
   "expected": {
-    "outputs": ["Apple", "Apple", "Banana", "Banana", "Kumquat"],
     "compiled": {
       "result": "success",
-      "isZoomConstant": true,
       "isFeatureConstant": false,
+      "isZoomConstant": true,
       "type": "string"
-    }
+    },
+    "outputs": ["Apple", "Apple", "Banana", "Banana", "Kumquat"],
+    "serialized": [
+      "string",
+      [
+        "match",
+        ["string", ["get", "x"]],
+        "B",
+        "Banana",
+        "b",
+        "Banana",
+        "A",
+        "Apple",
+        "a",
+        "Apple",
+        "Kumquat"
+      ]
+    ]
   }
 }

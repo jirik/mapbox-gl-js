@@ -14,12 +14,25 @@
     [{}, {"properties": {"x": "1"}}]
   ],
   "expected": {
-    "outputs": ["match", "match", "match", "match", "otherwise"],
     "compiled": {
       "result": "success",
-      "isZoomConstant": true,
       "isFeatureConstant": false,
+      "isZoomConstant": true,
       "type": "string"
-    }
+    },
+    "outputs": ["match", "match", "match", "match", "otherwise"],
+    "serialized": [
+      "match",
+      ["string", ["get", "x"]],
+      "weird\u2028json\u2029issue",
+      "match",
+      "{}",
+      "match",
+      "a.b",
+      "match",
+      "0-1",
+      "match",
+      "otherwise"
+    ]
   }
 }
