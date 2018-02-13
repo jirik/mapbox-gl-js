@@ -997,15 +997,13 @@ test('Style#addLayer', (t) => {
         const layer = {id: 'background', type: 'background'};
 
         style.on('error', (e) => {
-            t.deepEqual(e.layer, {id: 'background'});
-            t.notOk(/duplicate/.match(e.error.message));
+            t.notOk(/already exists on this map/.match(e.error));
             t.end();
         });
 
         style.on('style.load', () => {
             style.addLayer(layer);
             style.addLayer(layer);
-            t.end();
         });
     });
 

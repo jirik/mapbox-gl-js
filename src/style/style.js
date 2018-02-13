@@ -33,6 +33,7 @@ import type Transform from '../geo/transform';
 import type {Source} from '../source/source';
 import type {StyleImage} from './style_image';
 import type {StyleGlyph} from './style_glyph';
+import type CollisionIndex from '../symbol/collision_index';
 import type {Callback} from '../types/callback';
 import type EvaluationParameters from './evaluation_parameters';
 import type Placement from '../symbol/placement';
@@ -90,6 +91,7 @@ class Style extends Evented {
     _updatedPaintProps: {[layer: string]: true};
     _layerOrderChanged: boolean;
 
+    collisionIndex: CollisionIndex;
     crossTileSymbolIndex: CrossTileSymbolIndex;
     pauseablePlacement: PauseablePlacement;
     placement: Placement;
@@ -520,6 +522,10 @@ class Style extends Evented {
         this._checkLoaded();
 
         const id = layerObject.id;
+        if (this.getLayer(id)) {
+            this.fire('error', {error: new Error(`Layer with id "${id}" already exists on this map`)});
+            return;
+        }
 
         if (typeof layerObject.source === 'object') {
             this.addSource(id, layerObject.source);
@@ -849,7 +855,7 @@ class Style extends Evented {
         const sourceResults = [];
         for (const id in this.sourceCaches) {
             if (params.layers && !includedSources[id]) continue;
-            const results = QueryFeatures.rendered(this.sourceCaches[id], this._layers, queryGeometry, params, zoom, bearing, this.placement ? this.placement.collisionIndex : null);
+            const results = QueryFeatures.rendered(this.sourceCaches[id], this._layers, queryGeometry, params, zoom, bearing, this.collisionIndex);
             sourceResults.push(results);
         }
         return this._flattenRenderedFeatures(sourceResults);
@@ -952,7 +958,7 @@ class Style extends Evented {
 
     _updatePlacement(transform: Transform, showCollisionBoxes: boolean, fadeDuration: number) {
         let symbolBucketsChanged = false;
-        let placementCommitted = false;
+        let placementChanged = false;
 
         const layerTiles = {};
 
@@ -983,18 +989,17 @@ class Style extends Evented {
             this._layerOrderChanged = false;
         }
 
-        if (this.pauseablePlacement.isDone()) {
-            // the last placement finished running, but the next one hasn’t
-            // started yet because of the `stillRecent` check immediately
-            // above, so mark it stale to ensure that we request another
-            // render frame
-            this.placement.setStale();
-        } else {
+        if (!this.pauseablePlacement.isDone()) {
             this.pauseablePlacement.continuePlacement(this._order, this._layers, layerTiles);
 
             if (this.pauseablePlacement.isDone()) {
-                this.placement = this.pauseablePlacement.commit(this.placement, browser.now());
-                placementCommitted = true;
+                const placement = this.pauseablePlacement.placement;
+                placementChanged = placement.commit(this.placement, browser.now());
+                if (!this.placement || placementChanged || symbolBucketsChanged) {
+                    this.placement = placement;
+                    this.collisionIndex = this.placement.collisionIndex;
+                }
+                this.placement.setRecent(browser.now(), placement.stale);
             }
 
             if (symbolBucketsChanged) {
@@ -1003,9 +1008,12 @@ class Style extends Evented {
                 // placement is already stale while it is in progress
                 this.pauseablePlacement.placement.setStale();
             }
+
+        } else {
+            this.placement.setStale();
         }
 
-        if (placementCommitted || symbolBucketsChanged) {
+        if (placementChanged || symbolBucketsChanged) {
             for (const layerID of this._order) {
                 const styleLayer = this._layers[layerID];
                 if (styleLayer.type !== 'symbol') continue;
