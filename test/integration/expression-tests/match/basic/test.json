@@ -24,10 +24,10 @@
     "serialized": [
       "match",
       ["string", ["get", "x"]],
-      "b",
-      "Banana",
       "a",
       "Apple",
+      "b",
+      "Banana",
       "Kumquat"
     ]
   }

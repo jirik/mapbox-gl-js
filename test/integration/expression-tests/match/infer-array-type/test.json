@@ -26,10 +26,10 @@
     "serialized": [
       "match",
       ["number", ["get", "x"]],
-      10,
-      ["literal", ["one", "two"]],
       0,
       ["literal", ["one"]],
+      10,
+      ["literal", ["one", "two"]],
       ["literal", ["one", "two", "three"]]
     ]
   }

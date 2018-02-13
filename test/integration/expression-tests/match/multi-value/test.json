@@ -31,14 +31,14 @@
       [
         "match",
         ["string", ["get", "x"]],
-        "B",
-        "Banana",
-        "b",
-        "Banana",
         "A",
         "Apple",
+        "B",
+        "Banana",
         "a",
         "Apple",
+        "b",
+        "Banana",
         "Kumquat"
       ]
     ]

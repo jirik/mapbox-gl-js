@@ -24,13 +24,13 @@
     "serialized": [
       "match",
       ["string", ["get", "x"]],
-      "weird\u2028json\u2029issue",
-      "match",
-      "{}",
+      "0-1",
       "match",
       "a.b",
       "match",
-      "0-1",
+      "weird\u2028json\u2029issue",
+      "match",
+      "{}",
       "match",
       "otherwise"
     ]
